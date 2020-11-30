@@ -2,14 +2,14 @@
 
 namespace TollFeeCalculator
 {
-    class Program
+    public class Program
     {
         static void Main()
         {
             run(Environment.CurrentDirectory + "../../../../testData.txt");
         }
 
-        static void run(String inputFile) {
+        public static void run(String inputFile) {
             string indata = System.IO.File.ReadAllText(inputFile);
             String[] dateStrings = indata.Split(", ");
             DateTime[] dates = new DateTime[dateStrings.Length-1];
