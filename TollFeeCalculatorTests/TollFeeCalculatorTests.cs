@@ -8,22 +8,27 @@ namespace TollFeeCalculatorTests
     [TestClass]
     public class TollFeeCalculatorTests
     {
+        private readonly Action<String> RunMockProgram;
+        private readonly SettingsMock _settings;
+        public TollFeeCalculatorTests()
+        {
+            RunMockProgram = Factory.CreateMockFeeCalculator().Run;
+            _settings = Factory.CreateMockSettings();
+        }
+
         [TestMethod]
         public void DataFile_Should_ThrowException_When_FileNotFound()
         {
-            var filePath = Environment.CurrentDirectory + "testData.txt";
-            Action<String> actual = Program.run;
-            Assert.ThrowsException<System.IO.FileNotFoundException>(() => actual(filePath));
+            Assert.ThrowsException<FileNotFoundException>(() => RunMockProgram(_settings.DataFilePathFail));
         }
 
         [TestMethod]
         public void DataFile_Should_ContainProperDates_When_Read()
         {
-            var filePath = Environment.CurrentDirectory + "../../../../../TollFeeCalculator/testData.txt";
-            var date = File.ReadAllText(filePath);
+            var date = File.ReadAllText(_settings.DataFilePath);
             string soloDate = null;
 
-            if (date.Length > 300)
+            if (date.Length > 15)
                 soloDate = date.Substring(0, 16);
             else
                 Assert.Fail();
@@ -42,10 +47,9 @@ namespace TollFeeCalculatorTests
         {
             using (StringWriter stringWriter = new StringWriter())
             {
-                var filePath = Environment.CurrentDirectory + "../../../../../TollFeeCalculator/testData.txt";
                 Console.SetOut(stringWriter);
                 var expected = "The total fee for the inputfile is60";
-                Program.run(filePath);
+                RunMockProgram(_settings.DataFilePath);
                 Assert.AreEqual(expected, stringWriter.ToString());
             }
         }
