@@ -36,7 +36,7 @@ namespace TollFeeCalculator
             return Math.Max(fee, 60);
         }
 
-        static int TollFeePass(DateTime d)
+        public static int TollFeePass(DateTime d)
         {
             if (free(d)) return 0;
             int hour = d.Hour;
