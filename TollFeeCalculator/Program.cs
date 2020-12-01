@@ -1,8 +1,9 @@
 ﻿using System;
 
+
 namespace TollFeeCalculator
 {
-    class Program
+    public class Program
     {
         static void Main()
         {
@@ -26,30 +27,45 @@ namespace TollFeeCalculator
             {
                 long diffInMinutes = (d2 - si).Minutes;
                 if(diffInMinutes > 60) {
-                    fee += TollFeePass(d2);
+                    fee += CalculateFeeFromTime(d2);
                     si = d2;
                 } else {
-                    fee += Math.Max(TollFeePass(d2), TollFeePass(si));
+                    fee += Math.Max(CalculateFeeFromTime(d2), CalculateFeeFromTime(si));
                 }
             }
             return Math.Max(fee, 60);
         }
 
-        static int TollFeePass(DateTime d)
+        public static int CalculateFeeFromTime(DateTime timeOfToll)
         {
-            if (free(d)) return 0;
-            int hour = d.Hour;
-            int minute = d.Minute;
-            if (hour == 6 && minute >= 0 && minute <= 29) return 8;
-            else if (hour == 6 && minute >= 30 && minute <= 59) return 13;
-            else if (hour == 7 && minute >= 0 && minute <= 59) return 18;
-            else if (hour == 8 && minute >= 0 && minute <= 29) return 13;
-            else if (hour >= 8 && hour <= 14 && minute >= 30 && minute <= 59) return 8;
-            else if (hour == 15 && minute >= 0 && minute <= 29) return 13;
-            else if (hour == 15 && minute >= 0 || hour == 16 && minute <= 59) return 18;
-            else if (hour == 17 && minute >= 0 && minute <= 59) return 13;
-            else if (hour == 18 && minute >= 0 && minute <= 29) return 8;
-            else return 0;
+            if (free(timeOfToll)) return 0;
+            int hour = timeOfToll.Hour;
+            int minute = timeOfToll.Minute;
+            switch (hour)
+            {
+                case 6:
+                    if (minute <= 29) return 8;
+                    return 13;
+                case 7:
+                    return 18;
+                case 8:
+                    if (minute <= 29) return 13;
+                    return 8;
+                case 15:
+                    if (minute <= 29) return 13;
+                    return 18;
+                case 16:
+                    return 18;
+                case 17:
+                    return 13;
+                case 18:
+                    if (minute <= 29) return 8;
+                    return 0;
+                default:
+                    if (hour >= 8 && hour <= 14) return 8;
+                    return 0;
+            }
+
         }
         //Gets free dates
         static bool free(DateTime day) {
