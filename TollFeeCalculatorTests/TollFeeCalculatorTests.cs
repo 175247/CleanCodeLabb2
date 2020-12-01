@@ -18,7 +18,7 @@ namespace TollFeeCalculatorTests
         }
 
         [TestMethod]
-        public void TollFeePass_Should_ReturnCorrectAmount_When_TimeIsGiven()
+        public void CalculateFeeFromTime_Should_ReturnCorrectAmount_When_TimeIsGiven()
         {
             Assert.AreEqual(8, Program.CalculateFeeFromTime(new DateTime(2020, 2, 4, 6, 5, 0)));
             Assert.AreEqual(13, Program.CalculateFeeFromTime(new DateTime(2020, 2, 4, 6, 34, 0)));
