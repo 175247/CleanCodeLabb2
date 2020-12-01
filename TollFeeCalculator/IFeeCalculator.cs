@@ -6,7 +6,7 @@ namespace TollFeeCalculator
     {
         public void Run();
         public int TotalFeeCost(DateTime[] date);
-        public int TollFeePass(DateTime date);
+        public int CalculateFeeFromTime(DateTime date);
         public bool Free(DateTime day);
     }
 }
