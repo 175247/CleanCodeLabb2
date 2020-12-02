@@ -19,6 +19,40 @@ namespace TollFeeCalculatorTests
         }
 
         [TestMethod]
+        public void ProductionFactory_Should_ReturnDateTimeArray_When_Called()
+        {
+            var stringArray = new String[1];
+            var expected = new DateTime[1];
+            var actual = Factory.CreateDateTimeArray(stringArray);
+            Assert.AreEqual(expected.GetType(), actual.GetType());
+        }
+
+        [TestMethod]
+        public void TestFactory_Should_ReturnDateTimeArray_When_Called()
+        {
+            var stringArray = new String[1];
+            var expected = new DateTime[1];
+            var actual = TestFactory.CreateDateTimeArray(stringArray);
+            Assert.AreEqual(expected.GetType(), actual.GetType());
+        }
+
+        [TestMethod]
+        public void TestFactory_Should_ReturnSettingsMock_When_Called()
+        {
+            var expected = new SettingsMock();
+            var actual = TestFactory.CreateMockSettings();
+            Assert.AreEqual(expected.GetType(), actual.GetType());
+        }
+
+        [TestMethod]
+        public void TestFactory_Should_ReturnFeeCalculatorMock_When_Called()
+        {
+            var expected = new FeeCalculatorMock();
+            var actual = TestFactory.CreateMockFeeCalculator();
+            Assert.AreEqual(expected.GetType(), actual.GetType());
+        }
+
+        [TestMethod]
         public void DataFile_Should_ThrowException_When_FileNotFound()
         {
             Assert.ThrowsException<FileNotFoundException>(() => _sut.Run(_settings.InvalidDataFilePath));
