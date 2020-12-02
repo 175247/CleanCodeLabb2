@@ -4,17 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TollFeeCalculatorTests;
+using TollFeeCalculatorTests.Mocks;
 
 namespace TollFeeCalculator
 {
     public static class Factory
     {
-        public static SettingsMock CreateMockSettings()
+        public static ISettingsMock CreateMockSettings()
         {
             return new SettingsMock();
         }
 
-        public static FeeCalculatorMock CreateMockFeeCalculator()
+        public static IFeeCalculatorMock CreateMockFeeCalculator()
         {
             return new FeeCalculatorMock();
         }

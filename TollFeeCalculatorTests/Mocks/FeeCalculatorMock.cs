@@ -1,9 +1,11 @@
 ﻿using System;
 using TollFeeCalculator;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace TollFeeCalculatorTests
 {
-    public class FeeCalculatorMock : IFeeCalculator
+    public class FeeCalculatorMock : IFeeCalculatorMock
     {
         public void Run(string filePath)
         {
@@ -71,11 +73,6 @@ namespace TollFeeCalculatorTests
         public bool Free(DateTime day)
         {
             return (int)day.DayOfWeek == 5 || (int)day.DayOfWeek == 6 || day.Month == 7;
-        }
-
-        public void Run()
-        {
-            throw new NotImplementedException();
         }
     }
 }
