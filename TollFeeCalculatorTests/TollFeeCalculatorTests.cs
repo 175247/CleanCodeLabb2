@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using TollFeeCalculator;
+using TollFeeCalculator.Utilities;
 using TollFeeCalculatorTests.Mocks;
 
 namespace TollFeeCalculatorTests
@@ -13,8 +14,8 @@ namespace TollFeeCalculatorTests
         private readonly ISettingsMock _settings;
         public TollFeeCalculatorTests()
         {
-            _sut = Factory.CreateMockFeeCalculator();
-            _settings = Factory.CreateMockSettings();
+            _sut = TestFactory.CreateMockFeeCalculator();
+            _settings = TestFactory.CreateMockSettings();
         }
 
         [TestMethod]
