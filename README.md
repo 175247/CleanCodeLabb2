@@ -6,7 +6,7 @@ Simon Tillström
 
 *avklarat*
 
-1. Program class is named CalculateTollFee in source tree. (Fixed, Simon)
+1. Program class is named CalculateTollFee in source tree.
 2. Main() lacks params. Row 7.
 3. Naming convention for run and free should be PascalCase. Row 9, 12 and 56
 4. String is used instead of string. Both work but lower case is normal. Row 12, 14.
@@ -15,7 +15,7 @@ Simon Tillström
 7. For loop doesn't iterate through last index. Row 16
 8. Refaktorera hela koden så det blir mer läsbart. Hail Pontus!
 9. Free() kollar inte rätt dagar. Just nu dag 5 & 6, inte 6 & 7, samt kollar ej culture
-10. Filens sökväg är inte rätt. ../ går upp ett steg i dir.
+10. Cannot format to proper DateTime.
 
 *r. 24 Name variable startingInterval and remove comment
 r. 22 rename parameter and method
