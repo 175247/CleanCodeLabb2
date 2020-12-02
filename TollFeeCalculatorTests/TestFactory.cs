@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TollFeeCalculatorTests;
 using TollFeeCalculatorTests.Mocks;
 
-namespace TollFeeCalculator
+namespace TollFeeCalculator.Utilities
 {
-    public static class Factory
+    public class TestFactory
     {
+        public static DateTime[] CreateDateTimeArray(String[] dateStrings)
+        {
+            return new DateTime[dateStrings.Length - 1];
+        }
+
         public static ISettingsMock CreateMockSettings()
         {
             return new SettingsMock();

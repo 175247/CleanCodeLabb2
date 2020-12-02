@@ -14,7 +14,7 @@ namespace TollFeeCalculator
         {
             string indata = System.IO.File.ReadAllText(_settings.DataFilePath);
             String[] dateStrings = indata.Split(", ");
-            DateTime[] dates = new DateTime[dateStrings.Length - 1];
+            DateTime[] dates = Factory.CreateDateTimeArray(dateStrings);
             for (int i = 0; i < dates.Length; i++)
             {
                 dates[i] = DateTime.Parse(dateStrings[i]);
