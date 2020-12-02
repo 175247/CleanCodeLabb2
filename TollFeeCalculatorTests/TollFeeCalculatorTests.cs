@@ -12,27 +12,46 @@ namespace TollFeeCalculatorTests
     {
         private readonly IFeeCalculatorMock _sut;
         private readonly ISettingsMock _settings;
+
         public TollFeeCalculatorTests()
         {
             _sut = TestFactory.CreateMockFeeCalculator();
             _settings = TestFactory.CreateMockSettings();
         }
+        
+        [TestMethod]
+        public void GettingFileDataAsArray_Should_ReturnAnArrayOfString_When_Called()
+        {
+
+        }
+
+        [TestMethod]
+        public void ParsingDateTimes_Should_ReturnDateTimeArrayWithParsedValues_When_CalledWithStringArray()
+        {
+            
+        }
+
+        [TestMethod]
+        public void PassingDateTimeArray_Should_ReturnTotalCost_When_ChildMethodHasCalculatedValue()
+        {
+
+        }
 
         [TestMethod]
         public void ProductionFactory_Should_ReturnDateTimeArray_When_Called()
         {
-            var stringArray = new String[1];
+            var stringArray = new string[1];
             var expected = new DateTime[1];
-            var actual = Factory.CreateDateTimeArray(stringArray);
+            var actual = Factory.CreateDateTimeArray(stringArray.Length);
             Assert.AreEqual(expected.GetType(), actual.GetType());
         }
 
         [TestMethod]
         public void TestFactory_Should_ReturnDateTimeArray_When_Called()
         {
-            var stringArray = new String[1];
+            var stringArray = new string[1];
             var expected = new DateTime[1];
-            var actual = TestFactory.CreateDateTimeArray(stringArray);
+            var actual = TestFactory.CreateDateTimeArray(stringArray.Length);
             Assert.AreEqual(expected.GetType(), actual.GetType());
         }
 
@@ -61,21 +80,21 @@ namespace TollFeeCalculatorTests
         [TestMethod]
         public void DataFile_Should_ContainProperDates_When_Read()
         {
-            var date = File.ReadAllText(_settings.DataFilePath);
-            string soloDate = null;
+            var dates = File.ReadAllText(_settings.DataFilePath);
+            string[] soloDate = new string[1];
 
-            if (date.Length > 15)
-                soloDate = date.Substring(0, 16);
+            if (dates.Length > 15)
+                soloDate[0] = dates.Substring(0, 16);
             else
                 Assert.Fail();
 
-            DateTime dateTime = DateTime.Parse(soloDate);
-            var dateTimeAsString = dateTime.ToString();
-            dateTimeAsString = dateTimeAsString.Substring(0, dateTimeAsString.Length - 3);
-
-            var expected = "2020-06-30 00:05";
-            var actual = dateTimeAsString;
-            Assert.AreEqual(expected, actual);
+            DateTime[] dateTimes = TestFactory.CreateDateTimeArray(1);
+            var expected = new DateTime[]
+            { 
+                new DateTime(2020, 6, 30, 0, 5, 0) 
+            };
+            var actual = _sut.ParseDateTimes(ref dateTimes, in soloDate);
+            Assert.AreEqual(expected[0], actual[0]);
         }
 
         [TestMethod]
@@ -100,7 +119,7 @@ namespace TollFeeCalculatorTests
             using (StringWriter stringWriter = new StringWriter())
             {
                 Console.SetOut(stringWriter);
-                var expected = "The total fee for the inputfile is60";
+                var expected = "The total fee for the inputfile is 71";
                 _sut.Run(_settings.DataFilePath);
                 Assert.AreEqual(expected, stringWriter.ToString());
             }

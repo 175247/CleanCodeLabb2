@@ -4,9 +4,9 @@ namespace TollFeeCalculator
 {
     public static class Factory
     {
-        public static DateTime[] CreateDateTimeArray(String[] dateStrings)
+        public static DateTime[] CreateDateTimeArray(int arrayLength)
         {
-            return new DateTime[dateStrings.Length - 1];
+            return new DateTime[arrayLength];
         }
     }
 }

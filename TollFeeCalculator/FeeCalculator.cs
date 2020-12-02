@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace TollFeeCalculator
 {
@@ -12,17 +13,30 @@ namespace TollFeeCalculator
 
         public void Run()
         {
-            string indata = System.IO.File.ReadAllText(_settings.DataFilePath);
-            String[] dateStrings = indata.Split(", ");
-            DateTime[] dates = Factory.CreateDateTimeArray(dateStrings);
-            for (int i = 0; i < dates.Length; i++)
-            {
-                dates[i] = DateTime.Parse(dateStrings[i]);
-            }
-            Console.Write("The total fee for the inputfile is" + TotalFeeCost(dates));
+            string[] unformattedDates = GetFileDataAsArray();
+            DateTime[] dates = Factory.CreateDateTimeArray(unformattedDates.Length);
+            ParseDateTimes(ref dates, in unformattedDates);
+            int TotalCost = CalculateCost(dates);
+            Console.Write("The total fee for the inputfile is {0}", TotalCost);
         }
 
-        public int TotalFeeCost(DateTime[] d)
+        public string[] GetFileDataAsArray()
+        {
+            string fileData = File.ReadAllText(_settings.DataFilePath);
+            string[] unformattedDates = fileData.Split(",");
+            return unformattedDates;
+        }
+
+        public DateTime[] ParseDateTimes(ref DateTime[] dates, in string[] unformattedData)
+        {
+            for (int i = 0; i < dates.Length; i++)
+            {
+                dates[i] = DateTime.Parse(unformattedData[i]);
+            }
+            return dates;
+        }
+
+        public int CalculateCost(DateTime[] d)
         {
             int fee = 0;
             DateTime si = d[0]; //Starting interval

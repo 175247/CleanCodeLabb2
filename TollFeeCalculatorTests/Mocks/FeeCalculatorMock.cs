@@ -1,7 +1,9 @@
 ﻿using System;
 using TollFeeCalculator;
 using Microsoft.Extensions.DependencyInjection;
-
+using System.IO;
+using TollFeeCalculatorTests.Mocks;
+using TollFeeCalculator.Utilities;
 
 namespace TollFeeCalculatorTests
 {
@@ -9,21 +11,34 @@ namespace TollFeeCalculatorTests
     {
         public void Run(string filePath)
         {
-            string indata = System.IO.File.ReadAllText(filePath);
-            String[] dateStrings = indata.Split(", ");
-            DateTime[] dates = new DateTime[dateStrings.Length - 1];
-            for (int i = 0; i < dates.Length; i++)
-            {
-                dates[i] = DateTime.Parse(dateStrings[i]);
-            }
-            Console.Write("The total fee for the inputfile is" + TotalFeeCost(dates));
+            string[] unformattedDates = GetFileDataAsArray(filePath);
+            DateTime[] dates = Factory.CreateDateTimeArray(unformattedDates.Length);
+            ParseDateTimes(ref dates, in unformattedDates);
+            int TotalCost = CalculateCost(dates);
+            Console.Write("The total fee for the inputfile is {0}", TotalCost);
         }
 
-        public int TotalFeeCost(DateTime[] date)
+        public string[] GetFileDataAsArray(string filePath)
+        {
+            string fileData = File.ReadAllText(filePath);
+            string[] unformattedDates = fileData.Split(",");
+            return unformattedDates;
+        }
+
+        public DateTime[] ParseDateTimes(ref DateTime[] dates, in string[] unformattedData)
+        {
+            for (int i = 0; i < dates.Length; i++)
+            {
+                dates[i] = DateTime.Parse(unformattedData[i]);
+            }
+            return dates;
+        }
+
+        public int CalculateCost(DateTime[] d)
         {
             int fee = 0;
-            DateTime si = date[0]; //Starting interval
-            foreach (var d2 in date)
+            DateTime si = d[0]; //Starting interval
+            foreach (var d2 in d)
             {
                 long diffInMinutes = (d2 - si).Minutes;
                 if (diffInMinutes > 60)
@@ -70,6 +85,7 @@ namespace TollFeeCalculatorTests
             }
         }
 
+        //Gets free dates
         public bool Free(DateTime day)
         {
             return (int)day.DayOfWeek == 5 || (int)day.DayOfWeek == 6 || day.Month == 7;

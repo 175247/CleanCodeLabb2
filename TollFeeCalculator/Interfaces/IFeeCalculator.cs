@@ -5,7 +5,9 @@ namespace TollFeeCalculator
     public interface IFeeCalculator
     {
         public void Run();
-        public int TotalFeeCost(DateTime[] date);
+        public string[] GetFileDataAsArray();
+        public DateTime[] ParseDateTimes(ref DateTime[] dates, in string[] unformattedData);
+        public int CalculateCost(DateTime[] date);
         public int CalculateFeeFromTime(DateTime date);
         public bool Free(DateTime day);
     }

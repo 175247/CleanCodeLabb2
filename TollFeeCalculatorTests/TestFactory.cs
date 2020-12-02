@@ -4,11 +4,11 @@ using TollFeeCalculatorTests.Mocks;
 
 namespace TollFeeCalculator.Utilities
 {
-    public class TestFactory
+    public static class TestFactory
     {
-        public static DateTime[] CreateDateTimeArray(String[] dateStrings)
+        public static DateTime[] CreateDateTimeArray(int arrayLength)
         {
-            return new DateTime[dateStrings.Length - 1];
+            return new DateTime[arrayLength];
         }
 
         public static ISettingsMock CreateMockSettings()
