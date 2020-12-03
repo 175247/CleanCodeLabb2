@@ -51,6 +51,14 @@ namespace TollFeeCalculatorTests
         public void PassingDateTimeArray_Should_ReturnTotalCost_When_ChildMethodHasCalculatedValue()
         {
             //public int CalculateCost(DateTime[] d)
+            var dates = _sut.GetFileDataAsArray(_settings.DataFilePath);
+            var datesArray = TestFactory.CreateDateTimeArray(dates.Length);
+            var formattedTestDates = _sut.ParseDateTimes(ref datesArray, in dates);
+
+            var expected = 71;
+            var actual = _sut.CalculateCost(formattedTestDates);
+
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
