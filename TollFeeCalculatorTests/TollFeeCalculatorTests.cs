@@ -22,19 +22,35 @@ namespace TollFeeCalculatorTests
         [TestMethod]
         public void GettingFileDataAsArray_Should_ReturnAnArrayOfString_When_Called()
         {
-
+            var expected = new string[2];
+            var actual = _sut.GetFileDataAsArray(_settings.DataFilePath);
+            Assert.AreEqual(expected.GetType(), actual.GetType());
         }
 
         [TestMethod]
         public void ParsingDateTimes_Should_ReturnDateTimeArrayWithParsedValues_When_CalledWithStringArray()
         {
-            
+            var dates = _sut.GetFileDataAsArray(_settings.DataFilePath);
+            DateTime[] dateTimes = TestFactory.CreateDateTimeArray(dates.Length);
+
+            var expected = new DateTime[]
+            {
+                new DateTime(2020, 6, 30, 6, 34, 0)
+            };
+
+            var actual = _sut.ParseDateTimes(ref dateTimes, in dates);
+            Assert.AreEqual(expected[0], actual[1]);
         }
 
         [TestMethod]
         public void PassingDateTimeArray_Should_ReturnTotalCost_When_ChildMethodHasCalculatedValue()
         {
-
+            var dates = _sut.GetFileDataAsArray(_settings.DataFilePath);
+            var datesArray = TestFactory.CreateDateTimeArray(dates.Length);
+            var formattedTestDates = _sut.ParseDateTimes(ref datesArray, in dates);
+            var expected = 71;
+            var actual = _sut.CalculateCost(formattedTestDates);
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
