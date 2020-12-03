@@ -58,17 +58,17 @@ namespace TollFeeCalculatorTests
         [TestMethod]
         public void TestFactory_Should_ReturnSettingsMock_When_Called()
         {
-            var expected = new SettingsMock();
+            var expected = typeof(SettingsMock);
             var actual = TestFactory.CreateMockSettings();
-            Assert.AreEqual(expected.GetType(), actual.GetType());
+            Assert.AreEqual(expected, actual.GetType());
         }
 
         [TestMethod]
         public void TestFactory_Should_ReturnFeeCalculatorMock_When_Called()
         {
-            var expected = new FeeCalculatorMock();
+            var expected = typeof(FeeCalculatorMock);
             var actual = TestFactory.CreateMockFeeCalculator();
-            Assert.AreEqual(expected.GetType(), actual.GetType());
+            Assert.AreEqual(expected, actual.GetType());
         }
 
         [TestMethod]
