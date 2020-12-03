@@ -30,7 +30,21 @@ namespace TollFeeCalculatorTests
         [TestMethod]
         public void ParsingDateTimes_Should_ReturnDateTimeArrayWithParsedValues_When_CalledWithStringArray()
         {
-            //public DateTime[] ParseDateTimes(ref DateTime[] dates, in string[] unformattedData)
+            var dates = File.ReadAllText(_settings.DataFilePath);
+            string[] soloDate = new string[1];
+            
+            if (dates.Length > 15)
+                soloDate[0] = dates.Substring(0, 16);
+
+            DateTime[] dateTimes = TestFactory.CreateDateTimeArray(1);
+
+            var expected = new DateTime[]
+            {
+                new DateTime(2020, 6, 30, 0, 5, 0)
+            };
+
+            var actual = _sut.ParseDateTimes(ref dateTimes, in soloDate);
+            Assert.AreEqual(expected.GetType(), actual.GetType());
         }
 
         [TestMethod]
