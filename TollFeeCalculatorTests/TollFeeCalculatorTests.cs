@@ -22,7 +22,9 @@ namespace TollFeeCalculatorTests
         [TestMethod]
         public void GettingFileDataAsArray_Should_ReturnAnArrayOfString_When_Called()
         {
-            //public string[] GetFileDataAsArray(string filePath)
+            var expected = new string[2];
+            var actual = _sut.GetFileDataAsArray(_settings.DataFilePath);
+            Assert.AreEqual(expected.GetType(), actual.GetType());
         }
 
         [TestMethod]
