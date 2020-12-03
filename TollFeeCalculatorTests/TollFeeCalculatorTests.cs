@@ -22,19 +22,19 @@ namespace TollFeeCalculatorTests
         [TestMethod]
         public void GettingFileDataAsArray_Should_ReturnAnArrayOfString_When_Called()
         {
-
+            //public string[] GetFileDataAsArray(string filePath)
         }
 
         [TestMethod]
         public void ParsingDateTimes_Should_ReturnDateTimeArrayWithParsedValues_When_CalledWithStringArray()
         {
-            
+            //public DateTime[] ParseDateTimes(ref DateTime[] dates, in string[] unformattedData)
         }
 
         [TestMethod]
         public void PassingDateTimeArray_Should_ReturnTotalCost_When_ChildMethodHasCalculatedValue()
         {
-
+            //public int CalculateCost(DateTime[] d)
         }
 
         [TestMethod]
