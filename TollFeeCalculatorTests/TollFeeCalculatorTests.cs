@@ -114,9 +114,7 @@ namespace TollFeeCalculatorTests
         [DataTestMethod]
         public void CalculateFeeFromTime_Should_ReturnCorrectAmount_When_TimeIsGiven(int expectedFee,int year, int month, int day, int hour, int minute, int second)
         {
-            Program program = new Program();
-
-            Assert.AreEqual(expectedFee, program.CalculateFeeFromTime(new DateTime(year, month, day, hour, minute, second)));
+            Assert.AreEqual(expectedFee, _sut.CalculateFeeFromTime(new DateTime(year, month, day, hour, minute, second)));
         }
 
         [TestMethod]
