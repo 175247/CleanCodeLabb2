@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-
+using System;
 
 namespace TollFeeCalculator
 {
@@ -13,5 +13,6 @@ namespace TollFeeCalculator
             var feeCalculator = ActivatorUtilities.CreateInstance<FeeCalculator>(serviceProvider);
             feeCalculator.Run();
         }
+
     }
 }
