@@ -6,6 +6,7 @@ namespace TollFeeCalculator
     public class FeeCalculator : IFeeCalculator
     {
         private readonly ISettings _settings;
+
         public FeeCalculator(ISettings settings)
         {
             _settings = settings;
@@ -58,7 +59,7 @@ namespace TollFeeCalculator
 
         public int CalculateFeeFromTime(DateTime timeOfToll)
         {
-            if (Free(timeOfToll)) return 0;
+            if (CheckFreeDates(timeOfToll)) return 0;
             int hour = timeOfToll.Hour;
             int minute = timeOfToll.Minute;
             switch (hour)
@@ -88,9 +89,9 @@ namespace TollFeeCalculator
         }
 
         //Gets free dates
-        public bool Free(DateTime day)
+        public bool CheckFreeDates(DateTime timeOfToll)
         {
-            return (int)day.DayOfWeek == 5 || (int)day.DayOfWeek == 6 || day.Month == 7;
+            return timeOfToll.DayOfWeek == DayOfWeek.Saturday || timeOfToll.DayOfWeek == DayOfWeek.Sunday || timeOfToll.Month == 7;
         }
     }
 }
