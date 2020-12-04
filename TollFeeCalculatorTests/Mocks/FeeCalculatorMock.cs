@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using TollFeeCalculatorTests.Mocks;
 using TollFeeCalculator.Utilities;
+using System.Collections.Generic;
 
 namespace TollFeeCalculatorTests
 {
@@ -19,7 +20,7 @@ namespace TollFeeCalculatorTests
             int TotalCost = CalculateCost(dates);
             Console.Write("The total fee for the inputfile is {0}", TotalCost);
         }
-        
+
         public string[] GetFileDataAsArray(string filePath)
         {
             string fileData = File.ReadAllText(filePath);
@@ -54,10 +55,31 @@ namespace TollFeeCalculatorTests
         public int CalculateCost(DateTime[] days)
         {
             int fee = 0;
+            int currentIndex = 0;
+            var actualTimesToCharge = new List<DateTime>();
 
-            for (int i = 0; i < days.Length - 1; i++)
+            for(int i = 0; i < days.Length; i++)
             {
-                bool IsWithinSameDay = days[i].Day == days[i + 1].Day ? true : false;
+                if(days[i].Hour == days[i + 1].Hour && )
+                {
+                    var costOfPassageOne = CalculateFeeFromTime(days[i]);
+                    var costOfPassageTwo = CalculateFeeFromTime(days[i + 1]);
+
+                    if(costOfPassageOne > costOfPassageTwo)
+                    {
+                    actualTimesToCharge.Add(days[i]);
+                    }
+                    else
+                    {
+                        actualTimesToCharge.Add(days[i + 1]);
+                    }
+                }
+            }
+
+
+            foreach (var day in days)
+            {
+                bool IsWithinSameDay = days[currentIndex].Day == days[currentIndex + 1].Day ? true : false;
 
                 if (!IsWithinSameDay)
                 {
@@ -65,16 +87,16 @@ namespace TollFeeCalculatorTests
                 }
                 else
                 {
-                    if (IsWithinSameHour(days[i], days[i + 1]))
+                    if (IsWithinSameHour(days[currentIndex], days[currentIndex + 1]))
                     {
-                        fee += Math.Max(CalculateFeeFromTime(days[i]), CalculateFeeFromTime(days[i + 1]));
+                        fee += Math.Max(CalculateFeeFromTime(days[currentIndex]), CalculateFeeFromTime(days[currentIndex + 1]));
                     }
                     else
                     {
-                        fee += CalculateFeeFromTime(days[i + 1]);
+                        fee += CalculateFeeFromTime(days[currentIndex + 1]);
                     }
-
                 }
+                currentIndex++;
             }
             return Math.Min(fee, 60);
         }
@@ -113,26 +135,56 @@ namespace TollFeeCalculatorTests
             switch (hour)
             {
                 case 6:
-                    if (minute <= 29) return 8;
-                    return 13;
+                    if (minute <= 29)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 13;
+                    }
                 case 7:
                     return 18;
                 case 8:
-                    if (minute <= 29) return 13;
-                    return 8;
+                    if (minute <= 29)
+                    {
+                        return 13;
+                    }
+                    else
+                    {
+                        return 8;
+                    }
                 case 15:
-                    if (minute <= 29) return 13;
-                    return 18;
+                    if (minute <= 29)
+                    {
+                        return 13;
+                    }
+                    else
+                    {
+                        return 18;
+                    }
                 case 16:
                     return 18;
                 case 17:
                     return 13;
                 case 18:
-                    if (minute <= 29) return 8;
-                    return 0;
+                    if (minute <= 29)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
                 default:
-                    if (hour >= 8 && hour <= 14) return 8;
-                    return 0;
+                    if (hour >= 8 && hour <= 14)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
             }
         }
 
