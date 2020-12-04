@@ -34,21 +34,21 @@ namespace TollFeeCalculatorTests
             return dates;
         }
 
-        public int CalculateCost(DateTime[] d)
+        public int CalculateCost(DateTime[] day)
         {
             int fee = 0;
-            DateTime si = d[0]; //Starting interval
-            foreach (var d2 in d)
+            DateTime singleDay = day[0];
+            foreach (var times in day)
             {
-                long diffInMinutes = (d2 - si).Minutes;
+                long diffInMinutes = (times - singleDay).Minutes;
                 if (diffInMinutes > 60)
                 {
-                    fee += CalculateFeeFromTime(d2);
-                    si = d2;
+                    fee += CalculateFeeFromTime(times);
+                    singleDay = times;
                 }
                 else
                 {
-                    fee += Math.Max(CalculateFeeFromTime(d2), CalculateFeeFromTime(si));
+                    fee += Math.Max(CalculateFeeFromTime(times), CalculateFeeFromTime(singleDay));
                 }
             }
             return Math.Max(fee, 60);
