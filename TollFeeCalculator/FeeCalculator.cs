@@ -17,6 +17,8 @@ namespace TollFeeCalculator
             string[] unformattedDates = GetFileDataAsArray();
             DateTime[] dates = Factory.CreateDateTimeArray(unformattedDates.Length);
             ParseDateTimes(ref dates, in unformattedDates);
+            SortDataArray(ref dates);
+
             int TotalCost = CalculateCost(dates);
             Console.Write("The total fee for the inputfile is {0}", TotalCost);
         }
@@ -30,36 +32,86 @@ namespace TollFeeCalculator
 
         public DateTime[] ParseDateTimes(ref DateTime[] dates, in string[] unformattedData)
         {
-            for (int i = 0; i < dates.Length; i++)
-            {
-                dates[i] = DateTime.Parse(unformattedData[i]);
+            try 
+            { 
+                for (int i = 0; i < dates.Length; i++)
+                {
+                    dates[i] = DateTime.Parse(unformattedData[i]);
+                    Console.WriteLine(dates[i]);
+                }
             }
+            catch (Exception exception)
+            {
+                Console.WriteLine("File contained invalid data. {0}", exception);
+            }
+
             return dates;
         }
 
-        public int CalculateCost(DateTime[] d)
+        public DateTime[] SortDataArray(ref DateTime[] dates)
+        {
+            Array.Sort(dates);
+            return dates;
+        }
+
+        public int CalculateCost(DateTime[] days)
         {
             int fee = 0;
-            DateTime si = d[0]; //Starting interval
-            foreach (var d2 in d)
+
+            for (int i = 0; i < days.Length - 1; i++)
             {
-                long diffInMinutes = (d2 - si).Minutes;
-                if (diffInMinutes > 60)
+                bool IsWithinSameDay = days[i].Day == days[i + 1].Day ? true : false;
+
+                if (!IsWithinSameDay)
                 {
-                    fee += CalculateFeeFromTime(d2);
-                    si = d2;
+                    continue;
                 }
                 else
                 {
-                    fee += Math.Max(CalculateFeeFromTime(d2), CalculateFeeFromTime(si));
+
+                    if (IsWithinSameHour(days[i], days[i + 1]))
+                    {
+                        fee += Math.Max(CalculateFeeFromTime(days[i]), CalculateFeeFromTime(days[i + 1]));
+                    }
+                    else
+                    {
+                        fee += CalculateFeeFromTime(days[i]);
+                    }
+            
                 }
             }
-            return Math.Max(fee, 60);
+            return Math.Min(fee, 60);
+        }
+
+        public bool IsWithinSameHour(DateTime firstPassage, DateTime secondPassage)
+        {
+            DateTime firstPassageAddedHour = firstPassage.AddHours(1);
+            bool isMoreThanOneHour = secondPassage.Hour > firstPassageAddedHour.Hour;
+
+            if (isMoreThanOneHour)
+            {
+                return false;
+            }
+            else if (secondPassage.Hour > firstPassage.Hour
+                && secondPassage.Minute > firstPassage.Minute)
+            {
+                return false;
+            }
+            else if (secondPassage.Hour > firstPassage.Hour
+                && secondPassage.Minute < firstPassage.Minute)
+            {
+                return true;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public int CalculateFeeFromTime(DateTime timeOfToll)
         {
             if (CheckFreeDates(timeOfToll)) return 0;
+
             int hour = timeOfToll.Hour;
             int minute = timeOfToll.Minute;
             switch (hour)

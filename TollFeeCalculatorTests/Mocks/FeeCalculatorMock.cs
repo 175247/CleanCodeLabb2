@@ -34,22 +34,26 @@ namespace TollFeeCalculatorTests
             return dates;
         }
 
-        public int CalculateCost(DateTime[] day)
+        public int CalculateCost(DateTime[] days)
         {
             int fee = 0;
-            DateTime singleDay = day[0];
-            foreach (var times in day)
+            for (int i = 0; i < days.Length - 1; i++)
             {
-                long diffInMinutes = (times - singleDay).Minutes;
-                if (diffInMinutes > 60)
+                bool IsWithinSameDay = days[i].Day == days[i + 1].Day ? true : false;
+                bool IsWithinSameHour = days[i].Hour == days[i + 1].Hour ? true : false;
+
+                if (IsWithinSameDay)
                 {
-                    fee += CalculateFeeFromTime(times);
-                    singleDay = times;
+                    if (IsWithinSameHour)
+                        fee += Math.Max(CalculateFeeFromTime(days[i]), CalculateFeeFromTime(days[i + 1]));
+                    else
+                        fee += CalculateFeeFromTime(days[i]);
                 }
                 else
                 {
-                    fee += Math.Max(CalculateFeeFromTime(times), CalculateFeeFromTime(singleDay));
+                    fee += CalculateFeeFromTime(days[i]);
                 }
+                Console.WriteLine(days[i]);
             }
             return Math.Min(fee, 60);
         }
@@ -57,6 +61,7 @@ namespace TollFeeCalculatorTests
         public int CalculateFeeFromTime(DateTime timeOfToll)
         {
             if (CheckFreeDates(timeOfToll)) return 0;
+
             int hour = timeOfToll.Hour;
             int minute = timeOfToll.Minute;
             switch (hour)

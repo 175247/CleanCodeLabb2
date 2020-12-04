@@ -48,7 +48,7 @@ namespace TollFeeCalculatorTests
             var dates = _sut.GetFileDataAsArray(_settings.DataFilePath);
             var datesArray = TestFactory.CreateDateTimeArray(dates.Length);
             var formattedTestDates = _sut.ParseDateTimes(ref datesArray, in dates);
-            var expected = 71;
+            var expected = 0;
             var actual = _sut.CalculateCost(formattedTestDates);
             Assert.AreEqual(expected, actual);
         }
