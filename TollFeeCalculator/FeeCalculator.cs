@@ -75,7 +75,7 @@ namespace TollFeeCalculator
                     }
                     else
                     {
-                        fee += CalculateFeeFromTime(days[i]);
+                        fee += CalculateFeeFromTime(days[i + 1]);
                     }
             
                 }
