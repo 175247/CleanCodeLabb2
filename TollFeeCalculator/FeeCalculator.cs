@@ -68,7 +68,6 @@ namespace TollFeeCalculator
                 }
                 else
                 {
-
                     if (IsWithinSameHour(days[i], days[i + 1]))
                     {
                         fee += Math.Max(CalculateFeeFromTime(days[i]), CalculateFeeFromTime(days[i + 1]));
