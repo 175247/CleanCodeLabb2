@@ -51,7 +51,7 @@ namespace TollFeeCalculatorTests
                     fee += Math.Max(CalculateFeeFromTime(times), CalculateFeeFromTime(singleDay));
                 }
             }
-            return Math.Max(fee, 60);
+            return Math.Min(fee, 60);
         }
 
         public int CalculateFeeFromTime(DateTime timeOfToll)
