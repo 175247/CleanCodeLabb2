@@ -18,7 +18,7 @@ namespace TollFeeCalculatorTests
             _sut = TestFactory.CreateMockFeeCalculator();
             _settings = TestFactory.CreateMockSettings();
         }
-        
+
         [TestMethod]
         public void GettingFileDataAsArray_Should_ReturnAnArrayOfString_When_Called()
         {
@@ -105,27 +105,26 @@ namespace TollFeeCalculatorTests
         [TestMethod]
         public void DataFile_Should_ThrowException_When_FileNotFound()
         {
-            Assert.ThrowsException<FileNotFoundException>(() => _sut.Run(_settings.InvalidDataFilePath));
+            var expected = new FileNotFoundException();
+
+            try
+            {
+                Assert.ThrowsException<FileNotFoundException>(() => _sut.Run(_settings.InvalidDataFilePath));
+            }
+            catch (FileNotFoundException)
+            {
+                var actual = Assert.ThrowsException<FileNotFoundException>(() => _sut.Run(_settings.InvalidDataFilePath));
+                Assert.AreEqual(expected, actual);
+            }
         }
 
         [TestMethod]
         public void DataFile_Should_ContainProperDates_When_Read()
         {
-            var dates = File.ReadAllText(_settings.DataFilePath);
-            string[] soloDate = new string[1];
+            var expected = new DateTime(2020, 6, 30, 0, 5, 0);
+            var actual = _sut.ParseDateTimes(_sut.GetFileDataAsArray(_settings.DataFilePath))[0];
 
-            if (dates.Length > 15)
-                soloDate[0] = dates.Substring(0, 16);
-            else
-                Assert.Fail();
-
-            DateTime[] dateTimes = TestFactory.CreateDateTimeArray(1);
-            var expected = new DateTime[]
-            { 
-                new DateTime(2020, 6, 30, 0, 5, 0) 
-            };
-            var actual = _sut.ParseDateTimes(soloDate);
-            Assert.AreEqual(expected[0], actual[0]);
+            Assert.AreEqual(expected, actual);
         }
 
         [DataRow(8, 2020, 12, 4, 6, 5, 0, DisplayName = "Assures that between 6:00-6:29, a fee of 8 is calculated")]
@@ -142,10 +141,37 @@ namespace TollFeeCalculatorTests
         [DataRow(0, 2020, 12, 5, 8, 50, 0, DisplayName = "Assures that on a Saturday, a fee of 0 is calculated")]
         [DataRow(0, 2020, 12, 6, 14, 5, 0, DisplayName = "Assures that on a Sunday, a fee of 0 is calculated")]
         [DataRow(0, 2020, 7, 7, 9, 50, 0, DisplayName = "Assures that during July, on a weekday, a fee of 0 is calculated")]
+        
         [DataTestMethod]
-        public void CalculateFeeFromTime_Should_ReturnCorrectAmount_When_TimeIsGiven(int expectedFee,int year, int month, int day, int hour, int minute, int second)
+        public void CalculateFeeFromTime_Should_ReturnCorrectAmount_When_TimeIsGiven(int expectedFee, int year, int month, int day, int hour, int minute, int second)
         {
             Assert.AreEqual(expectedFee, _sut.CalculateFeeFromTime(new DateTime(year, month, day, hour, minute, second)));
+        }
+
+        [TestMethod]
+        public void IsWithinSameHour_Should_PickTheCorrectAlternative_When_SentMultipleOptions()
+        {
+            var currentHourAndMinutesIsHigherThanPreviousHourArray = new[]
+            {
+                new DateTime(2020, 6, 30, 14, 15, 0),
+                new DateTime(2020, 6, 30, 15, 20, 0)
+            };
+
+            var expectedCaseWhereCurrentHourAndCurrentMinutesIsHigherThanPreviousHour = 21;
+            var actualCaseWhereCurrentHourAndCurrentMinutesIsHigherThanPreviousHour = _sut.CalculateCost(currentHourAndMinutesIsHigherThanPreviousHourArray);
+
+            Assert.AreEqual(expectedCaseWhereCurrentHourAndCurrentMinutesIsHigherThanPreviousHour, actualCaseWhereCurrentHourAndCurrentMinutesIsHigherThanPreviousHour);
+
+            var currentHourIsHigherThanPreviousHourButMinutesAreLowerThanPreviousArray = new[]
+            {
+                new DateTime(2020, 6, 30, 15, 25, 0),
+                new DateTime(2020, 6, 30, 16, 24, 0)
+            };
+
+            var expectedCaseWhereCurrentHourIsHigherThanPreviousHourButCurrentMinutesIsLowerThanPreviousHour = 18;
+            var actualCaseWhereCurrentHourIsHigherThanPreviousHourButCurrentMinutesIsLowerThanPreviousHour = _sut.CalculateCost(currentHourIsHigherThanPreviousHourButMinutesAreLowerThanPreviousArray);
+
+            Assert.AreEqual(expectedCaseWhereCurrentHourIsHigherThanPreviousHourButCurrentMinutesIsLowerThanPreviousHour, actualCaseWhereCurrentHourIsHigherThanPreviousHourButCurrentMinutesIsLowerThanPreviousHour);
         }
 
         [TestMethod]

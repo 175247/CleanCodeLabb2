@@ -100,17 +100,20 @@ namespace TollFeeCalculatorTests
         public bool IsWithinSameHour(DateTime previousPassage, DateTime currentPassage)
         {
             bool isMoreThanOneHour = currentPassage.Hour > previousPassage.AddHours(1).Hour;
+            bool isCurrentPassageBothValuesHigher = currentPassage.Hour > previousPassage.Hour
+                && currentPassage.Minute > previousPassage.Minute;
+            bool isCurrentHourHigherButMinutesLower = currentPassage.Hour > previousPassage.Hour
+                && currentPassage.Minute < previousPassage.Minute;
+
             if (isMoreThanOneHour)
             {
                 return false;
             }
-            else if (currentPassage.Hour > previousPassage.Hour
-                && currentPassage.Minute > previousPassage.Minute)
+            else if (isCurrentPassageBothValuesHigher)
             {
                 return false;
             }
-            else if (currentPassage.Hour > previousPassage.Hour
-                && currentPassage.Minute < previousPassage.Minute)
+            else if (isCurrentHourHigherButMinutesLower)
             {
                 return true;
             }
