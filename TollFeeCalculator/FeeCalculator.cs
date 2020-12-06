@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -42,11 +43,17 @@ namespace TollFeeCalculator
 
         public DateTime[] ParseDateTimes(string[] unformattedData)
         {
+            var formattedDataList = new List<DateTime>();
+
             try
             {
-                return Enumerable.Range(1, unformattedData.Length)
-                    .Select(index => DateTime.Parse(unformattedData[index - 1]))
-                    .ToArray();
+                for (int i = 1; i < unformattedData.Length - 1; i++)
+                {
+                    var formattedData = DateTime.Parse(unformattedData[i - 1]);
+                    formattedDataList.Add(formattedData);
+                }
+
+                return formattedDataList.ToArray();
             }
             catch (Exception exception)
             {
@@ -104,17 +111,22 @@ namespace TollFeeCalculator
         public bool IsWithinSameHour(DateTime previousPassage, DateTime currentPassage)
         {
             bool isMoreThanOneHour = currentPassage.Hour > previousPassage.AddHours(1).Hour;
+            
+            bool isCurrentPassageBothValuesHigher = currentPassage.Hour > previousPassage.Hour
+                && currentPassage.Minute > previousPassage.Minute;
+            
+            bool isCurrentHourHigherButMinutesLower = currentPassage.Hour > previousPassage.Hour
+                && currentPassage.Minute < previousPassage.Minute;
+
             if (isMoreThanOneHour)
             {
                 return false;
             }
-            else if (currentPassage.Hour > previousPassage.Hour
-                && currentPassage.Minute > previousPassage.Minute)
+            else if (isCurrentPassageBothValuesHigher)
             {
                 return false;
             }
-            else if (currentPassage.Hour > previousPassage.Hour
-                && currentPassage.Minute < previousPassage.Minute)
+            else if (isCurrentHourHigherButMinutesLower)
             {
                 return true;
             }
