@@ -111,10 +111,10 @@ namespace TollFeeCalculator
         public bool IsWithinSameHour(DateTime previousPassage, DateTime currentPassage)
         {
             bool isMoreThanOneHour = currentPassage.Hour > previousPassage.AddHours(1).Hour;
-            
+
             bool isCurrentPassageBothValuesHigher = currentPassage.Hour > previousPassage.Hour
                 && currentPassage.Minute > previousPassage.Minute;
-            
+
             bool isCurrentHourHigherButMinutesLower = currentPassage.Hour > previousPassage.Hour
                 && currentPassage.Minute < previousPassage.Minute;
 
@@ -138,39 +138,82 @@ namespace TollFeeCalculator
 
         public int CalculateFeeFromTime(DateTime timeOfToll)
         {
-            if (CheckFreeDates(timeOfToll)) return 0;
+            if (CheckFreeDates(timeOfToll))
+            {
+                return 0;
+            }
 
             int hour = timeOfToll.Hour;
             int minute = timeOfToll.Minute;
+
             switch (hour)
             {
                 case 6:
-                    if (minute <= 29) return 8;
-                    return 13;
+                    if (minute <= 29)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 13;
+                    }
+
                 case 7:
                     return 18;
+
                 case 8:
-                    if (minute <= 29) return 13;
-                    return 8;
+                    if (minute <= 29)
+                    {
+                        return 13;
+                    }
+                    else
+                    {
+                        return 8;
+                    }
+
                 case 15:
-                    if (minute <= 29) return 13;
-                    return 18;
+                    if (minute <= 29)
+                    {
+                        return 13;
+                    }
+                    else
+                    {
+                        return 18;
+                    }
+
                 case 16:
                     return 18;
+
                 case 17:
                     return 13;
+
                 case 18:
-                    if (minute <= 29) return 8;
-                    return 0;
+                    if (minute <= 29)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+
                 default:
-                    if (hour >= 8 && hour <= 14) return 8;
-                    return 0;
+                    if (hour >= 8 && hour <= 14)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
             }
         }
 
         public bool CheckFreeDates(DateTime timeOfToll)
         {
-            return timeOfToll.DayOfWeek == DayOfWeek.Saturday || timeOfToll.DayOfWeek == DayOfWeek.Sunday || timeOfToll.Month == 7;
+            return timeOfToll.DayOfWeek == DayOfWeek.Saturday 
+                    || timeOfToll.DayOfWeek == DayOfWeek.Sunday 
+                    || timeOfToll.Month == 7;
         }
     }
 }

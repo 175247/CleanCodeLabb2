@@ -28,11 +28,13 @@ namespace TollFeeCalculatorTests
             {
                 fileData = File.ReadAllText(filePath);
                 string[] unformattedDates = fileData.Split(",");
+
                 return unformattedDates;
             }
             catch (FileNotFoundException)
             {
                 Console.WriteLine("Invalid filepath.");
+
                 throw;
             }
         }
@@ -43,9 +45,10 @@ namespace TollFeeCalculatorTests
 
             try
             {
-                for(int i = 1; i < unformattedData.Length - 1; i++)
+                for (int i = 1; i < unformattedData.Length - 1; i++)
                 {
                     var formattedData = DateTime.Parse(unformattedData[i - 1]);
+
                     formattedDataList.Add(formattedData);
                 }
 
@@ -61,6 +64,7 @@ namespace TollFeeCalculatorTests
         public DateTime[] SortDataArray(ref DateTime[] tollPassages)
         {
             Array.Sort(tollPassages);
+
             return tollPassages;
         }
 
@@ -68,6 +72,7 @@ namespace TollFeeCalculatorTests
         {
             int fee = 0;
             DateTime previousPassage = default(DateTime);// = tollPassages[0];
+            
             foreach (var currentPassage in tollPassages)
             {
                 if (!IsWithinSameDay(tollPassages[0], currentPassage))
@@ -80,6 +85,7 @@ namespace TollFeeCalculatorTests
                 {
                     int previousPassageFee = CalculateFeeFromTime(previousPassage);
                     int currentPassageFee = CalculateFeeFromTime(currentPassage);
+
                     if (previousPassageFee >= currentPassageFee)
                     {
                         continue;
@@ -134,39 +140,82 @@ namespace TollFeeCalculatorTests
 
         public int CalculateFeeFromTime(DateTime timeOfToll)
         {
-            if (CheckFreeDates(timeOfToll)) return 0;
+            if (CheckFreeDates(timeOfToll))
+            {
+                return 0;
+            }
 
             int hour = timeOfToll.Hour;
             int minute = timeOfToll.Minute;
+
             switch (hour)
             {
                 case 6:
-                    if (minute <= 29) return 8;
-                    return 13;
+                    if (minute <= 29)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 13;
+                    }
+
                 case 7:
                     return 18;
+
                 case 8:
-                    if (minute <= 29) return 13;
-                    return 8;
+                    if (minute <= 29)
+                    {
+                        return 13;
+                    }
+                    else
+                    {
+                        return 8;
+                    }
+
                 case 15:
-                    if (minute <= 29) return 13;
-                    return 18;
+                    if (minute <= 29)
+                    {
+                        return 13;
+                    }
+                    else
+                    {
+                        return 18;
+                    }
+
                 case 16:
                     return 18;
+
                 case 17:
                     return 13;
+
                 case 18:
-                    if (minute <= 29) return 8;
-                    return 0;
+                    if (minute <= 29)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+
                 default:
-                    if (hour >= 8 && hour <= 14) return 8;
-                    return 0;
+                    if (hour >= 8 && hour <= 14)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
             }
         }
 
         public bool CheckFreeDates(DateTime timeOfToll)
         {
-            return timeOfToll.DayOfWeek == DayOfWeek.Saturday || timeOfToll.DayOfWeek == DayOfWeek.Sunday || timeOfToll.Month == 7;
+            return timeOfToll.DayOfWeek == DayOfWeek.Saturday
+                    || timeOfToll.DayOfWeek == DayOfWeek.Sunday
+                    || timeOfToll.Month == 7;
         }
     }
 }
