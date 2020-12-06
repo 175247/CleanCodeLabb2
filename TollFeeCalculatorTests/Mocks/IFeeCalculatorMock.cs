@@ -10,7 +10,7 @@ namespace TollFeeCalculatorTests
     {
         public void Run(string filePath);
         public string[] GetFileDataAsArray(string filePath);
-        public DateTime[] ParseDateTimes(ref DateTime[] dates, in string[] unformattedData);
+        public DateTime[] ParseDateTimes(string[] unformattedData);
         public int CalculateCost(DateTime[] date);
         public int CalculateFeeFromTime(DateTime date);
         public bool CheckFreeDates(DateTime timeOfToll);

@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using TollFeeCalculatorTests.Mocks;
 using TollFeeCalculator.Utilities;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace TollFeeCalculatorTests
 {
@@ -13,110 +13,104 @@ namespace TollFeeCalculatorTests
         public void Run(string filePath)
         {
             string[] unformattedDates = GetFileDataAsArray(filePath);
-            DateTime[] dates = Factory.CreateDateTimeArray(unformattedDates.Length);
-            ParseDateTimes(ref dates, in unformattedDates);
-            SortDataArray(ref dates);
+            DateTime[] tollPassages = ParseDateTimes(unformattedDates);
+            SortDataArray(ref tollPassages);
 
-            int TotalCost = CalculateCost(dates);
+            int TotalCost = CalculateCost(tollPassages);
             Console.Write("The total fee for the inputfile is {0}", TotalCost);
         }
 
         public string[] GetFileDataAsArray(string filePath)
         {
-            string fileData = File.ReadAllText(filePath);
-            string[] unformattedDates = fileData.Split(",");
-            return unformattedDates;
+            string fileData = "";
+            try
+            {
+                fileData = File.ReadAllText(filePath);
+                string[] unformattedDates = fileData.Split(",");
+                return unformattedDates;
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Invalid filepath.");
+                throw;
+            }
         }
 
-        public DateTime[] ParseDateTimes(ref DateTime[] dates, in string[] unformattedData)
+        public DateTime[] ParseDateTimes(string[] unformattedData)
         {
             try
             {
-                for (int i = 0; i < dates.Length; i++)
-                {
-                    dates[i] = DateTime.Parse(unformattedData[i]);
-                    Console.WriteLine(dates[i]);
-                }
+                return Enumerable.Range(1, unformattedData.Length)
+                    .Select(index => DateTime.Parse(unformattedData[index - 1]))
+                    .ToArray();
             }
             catch (Exception exception)
             {
-                Console.WriteLine("File contained invalid data. {0}", exception);
+                Console.WriteLine(exception);
+                throw;
             }
-
-            return dates;
         }
 
-        public DateTime[] SortDataArray(ref DateTime[] dates)
+        public DateTime[] SortDataArray(ref DateTime[] tollPassages)
         {
-            Array.Sort(dates);
-            return dates;
+            Array.Sort(tollPassages);
+            return tollPassages;
         }
 
-        public int CalculateCost(DateTime[] days)
+        public int CalculateCost(DateTime[] tollPassages)
         {
             int fee = 0;
-            int currentIndex = 0;
-            var actualTimesToCharge = new List<DateTime>();
-
-            for(int i = 0; i < days.Length; i++)
+            DateTime previousPassage = default(DateTime);// = tollPassages[0];
+            foreach (var currentPassage in tollPassages)
             {
-                if(days[i].Hour == days[i + 1].Hour && )
+                if (!IsWithinSameDay(tollPassages[0], currentPassage))
                 {
-                    var costOfPassageOne = CalculateFeeFromTime(days[i]);
-                    var costOfPassageTwo = CalculateFeeFromTime(days[i + 1]);
+                    break;
+                }
 
-                    if(costOfPassageOne > costOfPassageTwo)
+                if (previousPassage == default(DateTime)
+                    || IsWithinSameHour(previousPassage, currentPassage))
+                {
+                    int previousPassageFee = CalculateFeeFromTime(previousPassage);
+                    int currentPassageFee = CalculateFeeFromTime(currentPassage);
+                    if (previousPassageFee >= currentPassageFee)
                     {
-                    actualTimesToCharge.Add(days[i]);
+                        continue;
                     }
                     else
                     {
-                        actualTimesToCharge.Add(days[i + 1]);
+                        fee = Math.Abs(fee - previousPassageFee);
+                        fee += currentPassageFee;
                     }
-                }
-            }
-
-
-            foreach (var day in days)
-            {
-                bool IsWithinSameDay = days[currentIndex].Day == days[currentIndex + 1].Day ? true : false;
-
-                if (!IsWithinSameDay)
-                {
-                    continue;
                 }
                 else
                 {
-                    if (IsWithinSameHour(days[currentIndex], days[currentIndex + 1]))
-                    {
-                        fee += Math.Max(CalculateFeeFromTime(days[currentIndex]), CalculateFeeFromTime(days[currentIndex + 1]));
-                    }
-                    else
-                    {
-                        fee += CalculateFeeFromTime(days[currentIndex + 1]);
-                    }
+                    fee += CalculateFeeFromTime(currentPassage);
                 }
-                currentIndex++;
+                previousPassage = currentPassage;
             }
             return Math.Min(fee, 60);
         }
 
-        public bool IsWithinSameHour(DateTime firstPassage, DateTime secondPassage)
+        public bool IsWithinSameDay(DateTime initialPassage, DateTime currentPassage)
         {
-            DateTime firstPassageAddedHour = firstPassage.AddHours(1);
-            bool isMoreThanOneHour = secondPassage.Hour > firstPassageAddedHour.Hour;
+            return initialPassage.Day == currentPassage.Day ? true : false;
+        }
 
+        public bool IsWithinSameHour(DateTime previousPassage, DateTime currentPassage)
+        {
+            bool isMoreThanOneHour = currentPassage.Hour > previousPassage.AddHours(1).Hour;
             if (isMoreThanOneHour)
             {
                 return false;
             }
-            else if (secondPassage.Hour > firstPassage.Hour
-                && secondPassage.Minute > firstPassage.Minute)
+            else if (currentPassage.Hour > previousPassage.Hour
+                && currentPassage.Minute > previousPassage.Minute)
             {
                 return false;
             }
-            else if (secondPassage.Hour > firstPassage.Hour
-                && secondPassage.Minute < firstPassage.Minute)
+            else if (currentPassage.Hour > previousPassage.Hour
+                && currentPassage.Minute < previousPassage.Minute)
             {
                 return true;
             }
@@ -135,60 +129,29 @@ namespace TollFeeCalculatorTests
             switch (hour)
             {
                 case 6:
-                    if (minute <= 29)
-                    {
-                        return 8;
-                    }
-                    else
-                    {
-                        return 13;
-                    }
+                    if (minute <= 29) return 8;
+                    return 13;
                 case 7:
                     return 18;
                 case 8:
-                    if (minute <= 29)
-                    {
-                        return 13;
-                    }
-                    else
-                    {
-                        return 8;
-                    }
+                    if (minute <= 29) return 13;
+                    return 8;
                 case 15:
-                    if (minute <= 29)
-                    {
-                        return 13;
-                    }
-                    else
-                    {
-                        return 18;
-                    }
+                    if (minute <= 29) return 13;
+                    return 18;
                 case 16:
                     return 18;
                 case 17:
                     return 13;
                 case 18:
-                    if (minute <= 29)
-                    {
-                        return 8;
-                    }
-                    else
-                    {
-                        return 0;
-                    }
+                    if (minute <= 29) return 8;
+                    return 0;
                 default:
-                    if (hour >= 8 && hour <= 14)
-                    {
-                        return 8;
-                    }
-                    else
-                    {
-                        return 0;
-                    }
+                    if (hour >= 8 && hour <= 14) return 8;
+                    return 0;
             }
         }
 
-        //Gets free dates
         public bool CheckFreeDates(DateTime timeOfToll)
         {
             return timeOfToll.DayOfWeek == DayOfWeek.Saturday || timeOfToll.DayOfWeek == DayOfWeek.Sunday || timeOfToll.Month == 7;

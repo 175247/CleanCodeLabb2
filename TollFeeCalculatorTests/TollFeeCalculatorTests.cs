@@ -38,7 +38,7 @@ namespace TollFeeCalculatorTests
                 new DateTime(2020, 6, 30, 6, 34, 0)
             };
 
-            var actual = _sut.ParseDateTimes(ref dateTimes, in dates);
+            var actual = _sut.ParseDateTimes(dates);
             Assert.AreEqual(expected[0], actual[1]);
         }
 
@@ -47,7 +47,7 @@ namespace TollFeeCalculatorTests
         {
             var dates = _sut.GetFileDataAsArray(_settings.DataFilePath);
             var datesArray = TestFactory.CreateDateTimeArray(dates.Length);
-            var formattedTestDates = _sut.ParseDateTimes(ref datesArray, in dates);
+            var formattedTestDates = _sut.ParseDateTimes(dates);
             var expected = 55;
             var actual = _sut.CalculateCost(formattedTestDates);
             Assert.AreEqual(expected, actual);
@@ -60,6 +60,21 @@ namespace TollFeeCalculatorTests
             var expected = new DateTime[1];
             var actual = Factory.CreateDateTimeArray(stringArray.Length);
             Assert.AreEqual(expected.GetType(), actual.GetType());
+        }
+
+        [TestMethod]
+        public void HighestFee_Should_OnlyBeCounted_When_MorePassagesOccursWithinOneHour()
+        {
+            var passageArray = new[]
+            {
+                new DateTime(2020, 6, 30, 15, 05, 0),
+                new DateTime(2020, 6, 30, 15, 29, 0),
+                new DateTime(2020, 6, 30, 15, 35, 0)
+            };
+
+            var expected = 18;
+            var actual = _sut.CalculateCost(passageArray);
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
@@ -109,7 +124,7 @@ namespace TollFeeCalculatorTests
             { 
                 new DateTime(2020, 6, 30, 0, 5, 0) 
             };
-            var actual = _sut.ParseDateTimes(ref dateTimes, in soloDate);
+            var actual = _sut.ParseDateTimes(soloDate);
             Assert.AreEqual(expected[0], actual[0]);
         }
 
@@ -139,7 +154,7 @@ namespace TollFeeCalculatorTests
             using (StringWriter stringWriter = new StringWriter())
             {
                 Console.SetOut(stringWriter);
-                var expected = "The total fee for the inputfile is 71";
+                var expected = "The total fee for the inputfile is 55";
                 _sut.Run(_settings.DataFilePath);
                 Assert.AreEqual(expected, stringWriter.ToString());
             }
