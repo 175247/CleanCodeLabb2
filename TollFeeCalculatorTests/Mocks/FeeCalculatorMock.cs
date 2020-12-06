@@ -5,6 +5,7 @@ using System.IO;
 using TollFeeCalculatorTests.Mocks;
 using TollFeeCalculator.Utilities;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace TollFeeCalculatorTests
 {
@@ -38,11 +39,17 @@ namespace TollFeeCalculatorTests
 
         public DateTime[] ParseDateTimes(string[] unformattedData)
         {
+            var formattedDataList = new List<DateTime>();
+
             try
             {
-                return Enumerable.Range(1, unformattedData.Length)
-                    .Select(index => DateTime.Parse(unformattedData[index - 1]))
-                    .ToArray();
+                for(int i = 1; i < unformattedData.Length - 1; i++)
+                {
+                    var formattedData = DateTime.Parse(unformattedData[i - 1]);
+                    formattedDataList.Add(formattedData);
+                }
+
+                return formattedDataList.ToArray();
             }
             catch (Exception exception)
             {
