@@ -9,6 +9,6 @@ namespace TollFeeCalculator
 {
     public interface ISettings
     {
-        public string DataFilePath { get; }
+        public string DataFilePath { get; set; }
     }
 }

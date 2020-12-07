@@ -11,7 +11,7 @@ namespace TollFeeCalculator
             serviceCollection.AddTransient<ISettings, Settings>();
             var serviceProvider = serviceCollection.BuildServiceProvider();
             var feeCalculator = ActivatorUtilities.CreateInstance<FeeCalculator>(serviceProvider);
-            feeCalculator.Run();
+            feeCalculator.Run(new Settings().DataFilePath);
         }
     }
 }

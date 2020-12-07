@@ -8,16 +8,9 @@ namespace TollFeeCalculator
 {
     public class FeeCalculator
     {
-        private readonly ISettings _settings;
-
-        public FeeCalculator(ISettings settings)
+        public void Run(string filePath)
         {
-            _settings = settings;
-        }
-
-        public void Run()
-        {
-            string[] unformattedDates = GetFileDataAsArray();
+            string[] unformattedDates = GetFileDataAsArray(filePath);
             DateTime[] tollPassages = ParseDateTimes(unformattedDates);
 
             SortDataArray(ref tollPassages);
@@ -25,12 +18,12 @@ namespace TollFeeCalculator
             Console.Write("The total fee for the inputfile is {0}", TotalCost);
         }
 
-        public string[] GetFileDataAsArray()
+        public string[] GetFileDataAsArray(string filePath)
         {
             string fileData = "";
             try
             {
-                fileData = File.ReadAllText(_settings.DataFilePath);
+                fileData = File.ReadAllText(filePath);
                 string[] unformattedDates = fileData.Split(",");
 
                 return unformattedDates;
