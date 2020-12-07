@@ -29,7 +29,14 @@ namespace TollFeeCalculatorTests
         }
 
         [TestMethod]
-        public void ParsingDateTimes_Should_ReturnDateTimeArrayWithParsedValues_When_CalledWithStringArray()
+        public void GettingFileData_Should_ThrowFileNotFound_When_InvalidFilePath() 
+        {
+            var invalidSearchPath = "Matterhorn Project - Moo!";
+            Assert.ThrowsException<FileNotFoundException>(() => _sut.GetFileDataAsArray(invalidSearchPath));
+        }
+
+        [TestMethod]
+        public void ParsingDateTimes_Should_ReturnDateTimeArrayWithParsedValues_When_CalledWithValidStringArray()
         {
             var dates = _sut.GetFileDataAsArray(_settings.DataFilePath);
             DateTime[] dateTimes = TestFactory.CreateDateTimeArray(dates.Length);
@@ -41,23 +48,13 @@ namespace TollFeeCalculatorTests
 
             var actual = _sut.ParseDateTimes(dates);
             Assert.AreEqual(expected[0], actual[1]);
+        }
 
-            //var invalidStringDataArray = new string[1];
-            //var invalidStringData = "moo";
-            //invalidStringDataArray[0] = invalidStringData;
-            //
-            //var exceptionExpected = new FormatException();
-            //var exceptionActual = _sut.ParseDateTimes(invalidStringDataArray);
-            //
-            ////try
-            ////{
-            //Assert.ThrowsException<FormatException>(() => _sut.ParseDateTimes(invalidStringDataArray));
-            //}
-            //catch
-            //{
-            //    Assert.ThrowsException<FileNotFoundException>(() => _sut.Run(_settings.InvalidDataFilePath));
-            //    Assert.AreEqual(exceptionExpected, exceptionActual);
-            //}
+        [TestMethod]
+        public void PassingInvalidDateTimeArray_Should_ThrowFormatException_WhenUnableToParse()
+        {
+            var invalidStringDataArray = new string[1] { "moo" };
+            Assert.ThrowsException<FormatException>(() => _sut.ParseDateTimes(invalidStringDataArray));
         }
 
         [TestMethod]

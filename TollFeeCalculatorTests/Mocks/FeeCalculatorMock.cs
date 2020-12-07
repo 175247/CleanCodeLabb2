@@ -63,7 +63,7 @@ namespace TollFeeCalculatorTests
         public int CalculateCost(DateTime[] tollPassages)
         {
             int fee = 0;
-            DateTime previousPassage = default(DateTime);// = tollPassages[0];
+            DateTime previousPassage = default(DateTime);
 
             foreach (var currentPassage in tollPassages)
             {

@@ -12,7 +12,6 @@ namespace TollFeeCalculator
         {
             string[] unformattedDates = GetFileDataAsArray(filePath);
             DateTime[] tollPassages = ParseDateTimes(unformattedDates);
-
             SortDataArray(ref tollPassages);
             int TotalCost = CalculateCost(tollPassages);
             Console.Write("The total fee for the inputfile is {0}", TotalCost);
@@ -37,17 +36,11 @@ namespace TollFeeCalculator
 
         public DateTime[] ParseDateTimes(string[] unformattedData)
         {
-            var formattedDataList = new List<DateTime>();
-
             try
             {
-                for (int i = 1; i < unformattedData.Length - 1; i++)
-                {
-                    var formattedData = DateTime.Parse(unformattedData[i - 1]);
-                    formattedDataList.Add(formattedData);
-                }
-
-                return formattedDataList.ToArray();
+                return Enumerable.Range(1, unformattedData.Length)
+                    .Select(index => DateTime.Parse(unformattedData[index - 1]))
+                    .ToArray();
             }
             catch (Exception exception)
             {
@@ -59,7 +52,6 @@ namespace TollFeeCalculator
         public DateTime[] SortDataArray(ref DateTime[] tollPassages)
         {
             Array.Sort(tollPassages);
-
             return tollPassages;
         }
 
@@ -111,7 +103,7 @@ namespace TollFeeCalculator
         {
             bool isMoreThanOneHour = currentPassage.Hour > previousPassage.AddHours(1).Hour;
 
-            bool isCurrentPassageBothValuesHigher = currentPassage.Hour > previousPassage.Hour
+            bool isCurrentPassageHourAndMinutesHigher = currentPassage.Hour > previousPassage.Hour
                 && currentPassage.Minute > previousPassage.Minute;
 
             bool isCurrentHourHigherButMinutesLower = currentPassage.Hour > previousPassage.Hour
@@ -121,7 +113,7 @@ namespace TollFeeCalculator
             {
                 return false;
             }
-            else if (isCurrentPassageBothValuesHigher)
+            else if (isCurrentPassageHourAndMinutesHigher)
             {
                 return false;
             }
@@ -210,8 +202,8 @@ namespace TollFeeCalculator
 
         public bool CheckFreeDates(DateTime timeOfToll)
         {
-            return timeOfToll.DayOfWeek == DayOfWeek.Saturday 
-                    || timeOfToll.DayOfWeek == DayOfWeek.Sunday 
+            return timeOfToll.DayOfWeek == DayOfWeek.Saturday
+                    || timeOfToll.DayOfWeek == DayOfWeek.Sunday
                     || timeOfToll.Month == 7;
         }
     }

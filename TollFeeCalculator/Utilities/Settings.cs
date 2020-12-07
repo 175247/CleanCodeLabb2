@@ -9,6 +9,6 @@ namespace TollFeeCalculator
 {
     public class Settings : ISettings
     {
-        public string DataFilePath { get; set; } = Environment.CurrentDirectory + "../../../../testData.txt";
+        public string DataFilePath { get; } = Environment.CurrentDirectory + "../../../../testData.txt";
     }
 }
