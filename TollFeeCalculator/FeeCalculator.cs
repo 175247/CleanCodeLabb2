@@ -19,8 +19,8 @@ namespace TollFeeCalculator
         {
             string[] unformattedDates = GetFileDataAsArray();
             DateTime[] tollPassages = ParseDateTimes(unformattedDates);
-            SortDataArray(ref tollPassages);
 
+            SortDataArray(ref tollPassages);
             int TotalCost = CalculateCost(tollPassages);
             Console.Write("The total fee for the inputfile is {0}", TotalCost);
         }
@@ -32,6 +32,7 @@ namespace TollFeeCalculator
             {
                 fileData = File.ReadAllText(_settings.DataFilePath);
                 string[] unformattedDates = fileData.Split(",");
+
                 return unformattedDates;
             }
             catch (FileNotFoundException)
@@ -65,13 +66,15 @@ namespace TollFeeCalculator
         public DateTime[] SortDataArray(ref DateTime[] tollPassages)
         {
             Array.Sort(tollPassages);
+
             return tollPassages;
         }
 
         public int CalculateCost(DateTime[] tollPassages)
         {
             int fee = 0;
-            DateTime previousPassage = default(DateTime);// = tollPassages[0];
+            DateTime previousPassage = default(DateTime);
+
             foreach (var currentPassage in tollPassages)
             {
                 if (!IsWithinSameDay(tollPassages[0], currentPassage))
@@ -84,6 +87,7 @@ namespace TollFeeCalculator
                 {
                     int previousPassageFee = CalculateFeeFromTime(previousPassage);
                     int currentPassageFee = CalculateFeeFromTime(currentPassage);
+
                     if (previousPassageFee >= currentPassageFee)
                     {
                         continue;
@@ -98,8 +102,10 @@ namespace TollFeeCalculator
                 {
                     fee += CalculateFeeFromTime(currentPassage);
                 }
+
                 previousPassage = currentPassage;
             }
+
             return Math.Min(fee, 60);
         }
 

@@ -40,6 +40,23 @@ namespace TollFeeCalculatorTests
 
             var actual = _sut.ParseDateTimes(dates);
             Assert.AreEqual(expected[0], actual[1]);
+
+            var invalidStringDataArray = new string[1];
+            var invalidStringData = _settings.InvalidDataFilePath;
+            invalidStringDataArray[0] = invalidStringData;
+
+            var exceptionExpected = new FormatException();
+            var exceptionActual = _sut.ParseDateTimes(invalidStringDataArray);
+
+            //try
+            //{
+            Assert.ThrowsException<FormatException>(() => _sut.ParseDateTimes(invalidStringDataArray));
+            //}
+            //catch
+            //{
+            //    Assert.ThrowsException<FileNotFoundException>(() => _sut.Run(_settings.InvalidDataFilePath));
+            //    Assert.AreEqual(exceptionExpected, exceptionActual);
+            //}
         }
 
         [TestMethod]

@@ -16,7 +16,6 @@ namespace TollFeeCalculatorTests
             string[] unformattedDates = GetFileDataAsArray(filePath);
             DateTime[] tollPassages = ParseDateTimes(unformattedDates);
             SortDataArray(ref tollPassages);
-
             int TotalCost = CalculateCost(tollPassages);
             Console.Write("The total fee for the inputfile is {0}", TotalCost);
         }
@@ -41,18 +40,11 @@ namespace TollFeeCalculatorTests
 
         public DateTime[] ParseDateTimes(string[] unformattedData)
         {
-            var formattedDataList = new List<DateTime>();
-
             try
             {
-                for (int i = 1; i < unformattedData.Length - 1; i++)
-                {
-                    var formattedData = DateTime.Parse(unformattedData[i - 1]);
-
-                    formattedDataList.Add(formattedData);
-                }
-
-                return formattedDataList.ToArray();
+                return Enumerable.Range(1, unformattedData.Length)
+                    .Select(index => DateTime.Parse(unformattedData[index - 1]))
+                    .ToArray();
             }
             catch (Exception exception)
             {
@@ -72,7 +64,7 @@ namespace TollFeeCalculatorTests
         {
             int fee = 0;
             DateTime previousPassage = default(DateTime);// = tollPassages[0];
-            
+
             foreach (var currentPassage in tollPassages)
             {
                 if (!IsWithinSameDay(tollPassages[0], currentPassage))
@@ -100,8 +92,10 @@ namespace TollFeeCalculatorTests
                 {
                     fee += CalculateFeeFromTime(currentPassage);
                 }
+
                 previousPassage = currentPassage;
             }
+
             return Math.Min(fee, 60);
         }
 
@@ -114,7 +108,7 @@ namespace TollFeeCalculatorTests
         {
             bool isMoreThanOneHour = currentPassage.Hour > previousPassage.AddHours(1).Hour;
 
-            bool isCurrentPassageBothValuesHigher = currentPassage.Hour > previousPassage.Hour
+            bool isCurrentPassageHourAndMinutesHigher = currentPassage.Hour > previousPassage.Hour
                 && currentPassage.Minute > previousPassage.Minute;
 
             bool isCurrentHourHigherButMinutesLower = currentPassage.Hour > previousPassage.Hour
@@ -124,7 +118,7 @@ namespace TollFeeCalculatorTests
             {
                 return false;
             }
-            else if (isCurrentPassageBothValuesHigher)
+            else if (isCurrentPassageHourAndMinutesHigher)
             {
                 return false;
             }

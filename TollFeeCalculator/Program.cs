@@ -13,6 +13,5 @@ namespace TollFeeCalculator
             var feeCalculator = ActivatorUtilities.CreateInstance<FeeCalculator>(serviceProvider);
             feeCalculator.Run();
         }
-
     }
 }
