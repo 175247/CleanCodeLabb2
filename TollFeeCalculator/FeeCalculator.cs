@@ -1,96 +1,208 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace TollFeeCalculator
 {
-    public class FeeCalculator : IFeeCalculator
+    public class FeeCalculator
     {
-        private readonly ISettings _settings;
-        public FeeCalculator(ISettings settings)
+        public void Run(string filePath)
         {
-            _settings = settings;
-        }
-
-        public void Run()
-        {
-            string[] unformattedDates = GetFileDataAsArray();
-            DateTime[] dates = Factory.CreateDateTimeArray(unformattedDates.Length);
-            ParseDateTimes(ref dates, in unformattedDates);
-            int TotalCost = CalculateCost(dates);
+            string[] unformattedDates = GetFileDataAsArray(filePath);
+            DateTime[] tollPassages = ParseDateTimes(unformattedDates);
+            SortDataArray(ref tollPassages);
+            int TotalCost = CalculateCost(tollPassages);
             Console.Write("The total fee for the inputfile is {0}", TotalCost);
         }
 
-        public string[] GetFileDataAsArray()
+        public string[] GetFileDataAsArray(string filePath)
         {
-            string fileData = File.ReadAllText(_settings.DataFilePath);
-            string[] unformattedDates = fileData.Split(",");
-            return unformattedDates;
-        }
-
-        public DateTime[] ParseDateTimes(ref DateTime[] dates, in string[] unformattedData)
-        {
-            for (int i = 0; i < dates.Length; i++)
+            string fileData = "";
+            try
             {
-                dates[i] = DateTime.Parse(unformattedData[i]);
+                fileData = File.ReadAllText(filePath);
+                string[] unformattedDates = fileData.Split(",");
+
+                return unformattedDates;
             }
-            return dates;
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Invalid filepath.");
+                throw;
+            }
         }
 
-        public int CalculateCost(DateTime[] d)
+        public DateTime[] ParseDateTimes(string[] unformattedData)
+        {
+            try
+            {
+                return Enumerable.Range(1, unformattedData.Length)
+                    .Select(index => DateTime.Parse(unformattedData[index - 1]))
+                    .ToArray();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
+        }
+
+        public DateTime[] SortDataArray(ref DateTime[] tollPassages)
+        {
+            Array.Sort(tollPassages);
+            return tollPassages;
+        }
+
+        public int CalculateCost(DateTime[] tollPassages)
         {
             int fee = 0;
-            DateTime si = d[0]; //Starting interval
-            foreach (var d2 in d)
+            DateTime previousPassage = default(DateTime);
+
+            foreach (var currentPassage in tollPassages)
             {
-                long diffInMinutes = (d2 - si).Minutes;
-                if (diffInMinutes > 60)
+                if (!IsWithinSameDay(tollPassages[0], currentPassage))
                 {
-                    fee += CalculateFeeFromTime(d2);
-                    si = d2;
+                    break;
+                }
+
+                if (previousPassage == default(DateTime)
+                    || IsWithinSameHour(previousPassage, currentPassage))
+                {
+                    int previousPassageFee = CalculateFeeFromTime(previousPassage);
+                    int currentPassageFee = CalculateFeeFromTime(currentPassage);
+
+                    if (previousPassageFee >= currentPassageFee)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        fee = Math.Abs(fee - previousPassageFee);
+                        fee += currentPassageFee;
+                    }
                 }
                 else
                 {
-                    fee += Math.Max(CalculateFeeFromTime(d2), CalculateFeeFromTime(si));
+                    fee += CalculateFeeFromTime(currentPassage);
                 }
+
+                previousPassage = currentPassage;
             }
-            return Math.Max(fee, 60);
+
+            return Math.Min(fee, 60);
+        }
+
+        public bool IsWithinSameDay(DateTime initialPassage, DateTime currentPassage)
+        {
+            return initialPassage.Day == currentPassage.Day ? true : false;
+        }
+
+        public bool IsWithinSameHour(DateTime previousPassage, DateTime currentPassage)
+        {
+            bool isMoreThanOneHour = currentPassage.Hour > previousPassage.AddHours(1).Hour;
+
+            bool isCurrentPassageHourAndMinutesHigher = currentPassage.Hour > previousPassage.Hour
+                && currentPassage.Minute > previousPassage.Minute;
+
+            bool isCurrentHourHigherButMinutesLower = currentPassage.Hour > previousPassage.Hour
+                && currentPassage.Minute < previousPassage.Minute;
+
+            if (isMoreThanOneHour)
+            {
+                return false;
+            }
+            else if (isCurrentPassageHourAndMinutesHigher)
+            {
+                return false;
+            }
+            else if (isCurrentHourHigherButMinutesLower)
+            {
+                return true;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public int CalculateFeeFromTime(DateTime timeOfToll)
         {
-            if (Free(timeOfToll)) return 0;
+            if (CheckFreeDates(timeOfToll))
+            {
+                return 0;
+            }
+
             int hour = timeOfToll.Hour;
             int minute = timeOfToll.Minute;
+
             switch (hour)
             {
                 case 6:
-                    if (minute <= 29) return 8;
-                    return 13;
+                    if (minute <= 29)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 13;
+                    }
+
                 case 7:
                     return 18;
+
                 case 8:
-                    if (minute <= 29) return 13;
-                    return 8;
+                    if (minute <= 29)
+                    {
+                        return 13;
+                    }
+                    else
+                    {
+                        return 8;
+                    }
+
                 case 15:
-                    if (minute <= 29) return 13;
-                    return 18;
+                    if (minute <= 29)
+                    {
+                        return 13;
+                    }
+                    else
+                    {
+                        return 18;
+                    }
+
                 case 16:
                     return 18;
+
                 case 17:
                     return 13;
+
                 case 18:
-                    if (minute <= 29) return 8;
-                    return 0;
+                    if (minute <= 29)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+
                 default:
-                    if (hour >= 8 && hour <= 14) return 8;
-                    return 0;
+                    if (hour >= 8 && hour <= 14)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
             }
         }
 
-        //Gets free dates
-        public bool Free(DateTime day)
+        public bool CheckFreeDates(DateTime timeOfToll)
         {
-            return (int)day.DayOfWeek == 5 || (int)day.DayOfWeek == 6 || day.Month == 7;
+            return timeOfToll.DayOfWeek == DayOfWeek.Saturday
+                    || timeOfToll.DayOfWeek == DayOfWeek.Sunday
+                    || timeOfToll.Month == 7;
         }
     }
 }
