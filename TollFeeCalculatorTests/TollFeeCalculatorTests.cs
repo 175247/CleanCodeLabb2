@@ -1,10 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
-using System.Linq;
 using TollFeeCalculator;
-using TollFeeCalculator.Utilities;
-using TollFeeCalculatorTests.Mocks;
 
 namespace TollFeeCalculatorTests
 {
@@ -12,11 +9,13 @@ namespace TollFeeCalculatorTests
     public class TollFeeCalculatorTests
     {
         private readonly FeeCalculator _sut;
-        private readonly ISettingsMock _settings;
+        private readonly SettingsMock _settings;
+        private readonly Settings _productionSettings;
 
         public TollFeeCalculatorTests()
         {
-            _settings = TestFactory.CreateMockSettings();
+            _settings = new SettingsMock();
+            _productionSettings = new Settings();
             _sut = new FeeCalculator();
         }
 
@@ -39,7 +38,7 @@ namespace TollFeeCalculatorTests
         public void ParsingDateTimes_Should_ReturnDateTimeArrayWithParsedValues_When_CalledWithValidStringArray()
         {
             var dates = _sut.GetFileDataAsArray(_settings.DataFilePath);
-            DateTime[] dateTimes = TestFactory.CreateDateTimeArray(dates.Length);
+            DateTime[] dateTimes = new DateTime[dates.Length];
 
             var expected = new DateTime[]
             {
@@ -68,15 +67,6 @@ namespace TollFeeCalculatorTests
         }
 
         [TestMethod]
-        public void ProductionFactory_Should_ReturnDateTimeArray_When_Called()
-        {
-            var stringArray = new string[1];
-            var expected = new DateTime[1];
-            var actual = Factory.CreateDateTimeArray(stringArray.Length);
-            Assert.AreEqual(expected.GetType(), actual.GetType());
-        }
-
-        [TestMethod]
         public void HighestFee_Should_OnlyBeCounted_When_MorePassagesOccursWithinOneHour()
         {
             var passageArray = new[]
@@ -96,24 +86,8 @@ namespace TollFeeCalculatorTests
         {
             var stringArray = new string[1];
             var expected = new DateTime[1];
-            var actual = TestFactory.CreateDateTimeArray(stringArray.Length);
+            var actual = new DateTime[stringArray.Length];
             Assert.AreEqual(expected.GetType(), actual.GetType());
-        }
-
-        [TestMethod]
-        public void TestFactory_Should_ReturnSettingsMock_When_Called()
-        {
-            var expected = typeof(SettingsMock);
-            var actual = TestFactory.CreateMockSettings();
-            Assert.AreEqual(expected, actual.GetType());
-        }
-
-        [TestMethod]
-        public void TestFactory_Should_ReturnFeeCalculatorMock_When_Called()
-        {
-            var expected = typeof(FeeCalculatorMock);
-            var actual = TestFactory.CreateMockFeeCalculator();
-            Assert.AreEqual(expected, actual.GetType());
         }
 
         [TestMethod]
@@ -180,8 +154,17 @@ namespace TollFeeCalculatorTests
         }
 
         [TestMethod]
-        public void Program_Should_RunToEnd_When_FileIsFound() // Dir is different when running tests, that's why SettingsMock is used.
+        public void Settings_Should_ReturnFilePath_When_UsingItsGetter()
         {
+            var expected = Environment.CurrentDirectory + "../../../../testData.txt";
+            var actual = _productionSettings.DataFilePath;
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void Program_Should_RunToEnd_When_FileIsFound()
+        {
+            // Dir/FilePath is different when running tests, so SettingsMock is used.
             using (StringWriter stringWriter = new StringWriter())
             {
                 Console.SetOut(stringWriter);
